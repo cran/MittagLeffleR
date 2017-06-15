@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+
+<title>Introduction</title>
+
+<script type="text/javascript">
+window.onload = function() {
+  var imgs = document.getElementsByTagName('img'), i, img;
+  for (i = 0; i < imgs.length; i++) {
+    img = imgs[i];
+    // center an image if it is the only element of its parent
+    if (img.parentElement.childElementCount === 1)
+      img.parentElement.style.textAlign = 'center';
+  }
+};
+</script>
+
+
+
+<!-- MathJax scripts -->
+<script type="text/javascript" src="https://cdn.bootcss.com/mathjax/2.7.0/MathJax.js?config=TeX-MML-AM_CHTML">
+</script>
+
+
+<style type="text/css">
+body, td {
+   font-family: sans-serif;
+   background-color: white;
+   font-size: 13px;
+}
+
+body {
+  max-width: 800px;
+  margin: auto;
+  padding: 1em;
+  line-height: 20px;
+}
+
+tt, code, pre {
+   font-family: 'DejaVu Sans Mono', 'Droid Sans Mono', 'Lucida Console', Consolas, Monaco, monospace;
+}
+
+h1 {
+   font-size:2.2em;
+}
+
+h2 {
+   font-size:1.8em;
+}
+
+h3 {
+   font-size:1.4em;
+}
+
+h4 {
+   font-size:1.0em;
+}
+
+h5 {
+   font-size:0.9em;
+}
+
+h6 {
+   font-size:0.8em;
+}
+
+a:visited {
+   color: rgb(50%, 0%, 50%);
+}
+
+pre, img {
+  max-width: 100%;
+}
+pre {
+  overflow-x: auto;
+}
+pre code {
+   display: block; padding: 0.5em;
+}
+
+code {
+  font-size: 92%;
+  border: 1px solid #ccc;
+}
+
+code[class] {
+  background-color: #F8F8F8;
+}
+
+table, td, th {
+  border: none;
+}
+
+blockquote {
+   color:#666666;
+   margin:0;
+   padding-left: 1em;
+   border-left: 0.5em #EEE solid;
+}
+
+hr {
+   height: 0px;
+   border-bottom: none;
+   border-top-width: thin;
+   border-top-style: dotted;
+   border-top-color: #999999;
+}
+
+@media print {
+   * {
+      background: transparent !important;
+      color: black !important;
+      filter:none !important;
+      -ms-filter: none !important;
+   }
+
+   body {
+      font-size:12pt;
+      max-width:100%;
+   }
+
+   a, a:visited {
+      text-decoration: underline;
+   }
+
+   hr {
+      visibility: hidden;
+      page-break-before: always;
+   }
+
+   pre, blockquote {
+      padding-right: 1em;
+      page-break-inside: avoid;
+   }
+
+   tr, img {
+      page-break-inside: avoid;
+   }
+
+   img {
+      max-width: 100% !important;
+   }
+
+   @page :left {
+      margin: 15mm 20mm 15mm 10mm;
+   }
+
+   @page :right {
+      margin: 15mm 10mm 15mm 20mm;
+   }
+
+   p, h2, h3 {
+      orphans: 3; widows: 3;
+   }
+
+   h2, h3 {
+      page-break-after: avoid;
+   }
+}
+</style>
+
+
+
+</head>
+
+<body>
+<h2>Introduction</h2>
+
+<p>This vignette explains how the functions <code>dml()</code>, <code>pml()</code>, <code>qml()</code> and
+<code>rml()</code> are evaluated using the Mittag-Leffler function <code>mlf()</code> and 
+functions from the package <code>stabledist</code>. 
+Evaluation of the Mittag-Leffler function relies on the algorithm by
+@Garrappa2015. </p>
+
+<h4>Mittag-Leffler function</h4>
+
+<p>Write \(E_{\alpha, \beta}(z)\) for the two-parameter Mittag-Leffler function, 
+and \(E_\alpha(z) := E_{\alpha, 1}(z)\) for the one-parameter Mittag-Leffler
+function. 
+One has </p>
+
+<p>\[E_{\alpha, \beta}(z) = \sum_{k=0}^\infty \frac{z^k}{\Gamma(\beta + \alpha k)}, 
+  \quad \alpha \in \mathbb C, \Re(\alpha) > 0, z \in \mathbb C,\]</p>
+
+<p>see @Haubold2011a.</p>
+
+<h2>First type Mittag-Leffler distribution</h2>
+
+<h4><code>pml()</code></h4>
+
+<p>The cumulative distribution function at unit scale is (see @Haubold2011a)</p>
+
+<p>\[F(y) = 1 - E_\alpha(-y^\alpha)\]</p>
+
+<h4><code>dml()</code></h4>
+
+<p>The probability density function at unit scale is (see @Haubold2011a)</p>
+
+<p>\[f(y) = \frac{d}{dy} F(y) = y^{\alpha - 1} E_{\alpha, \alpha}(-y^\alpha)\]</p>
+
+<h4><code>qml()</code></h4>
+
+<p>The quantile function <code>qml()</code> is calculated by numeric inversion of the cumulative
+distribution function <code>pml()</code> using <code>stats::uniroot()</code>.</p>
+
+<h4><code>rml()</code></h4>
+
+<p>Mittag-Leffler random variables \(Z\) are generated as the product of 
+a stable random variable \(Y\) with Laplace Transform \(\exp(-s^\alpha)\)
+(using the package <code>stabledist</code>)
+and \(X^{1/\alpha}\) where \(X\) is a unit exponentially distributed random
+variable, see @Haubold2011a.</p>
+
+<h2>Second type Mittag-Leffler distribution</h2>
+
+<p>@limitCTRW introduce the inverse stable subordinator, a stochastic process
+\(E(t)\). The random variable \(E := E(1)\) has unit scale Mittag-Leffler distribution
+of second type, see the equation under Remark 3.1. By Corollary 3.1, \(E\)
+is equal in distribution to \(Y^{-\alpha}\): </p>
+
+<p>\[E \stackrel{d}{=} Y^{-\alpha},\]</p>
+
+<p>where \(Y\) is a sum-stable randomvariable as above. </p>
+
+<h4><code>pml()</code></h4>
+
+<p>Using <code>stabledist</code>, we can hence calculate the cumulative distribution function
+of \(E\):</p>
+
+<p>\[\mathbf P[E \le q] = \mathbf P[Y^{-\alpha} \le q]
+  = \mathbf P[Y \ge q^{-1/\alpha}]\]</p>
+
+<h4><code>dml()</code></h4>
+
+<p>The probability density function is evaluated using the formula</p>
+
+<p>\[f(x) = \frac{1}{\alpha} x^{-1-1/\alpha} f_Y(x^{-1/\alpha})\]</p>
+
+<p>where \(f_Y(x)\) is the probability density of the stable random variable
+\(Y\). </p>
+
+<h4><code>qml()</code></h4>
+
+<p>Let \(q = (F_Y^{-1}(1-p))^{-\alpha}\), where \(p \in (0,1)\) and 
+\(F_Y^{-1}\) denotes the quantile function of \(Y\), implemented in 
+<code>stabledist</code>. Then one confirms</p>
+
+<p>\[F_Y(q^{-1/\alpha}) = 1-p 
+  \Rightarrow \mathbf P[Y \ge q^{-1/\alpha}] = p
+  \Rightarrow \mathbf P[Y^{-\alpha} \le q] = p\]</p>
+
+<p>which means \(F_E(q) = p\). </p>
+
+<h4><code>rml()</code></h4>
+
+<p>Mittag-Leffler random variables \(E\) of second type are directly simulated
+as \(Y^{-\alpha}\), using <code>stabledist</code>.</p>
+
+<h2>References</h2>
+
+</body>
+
+</html>
