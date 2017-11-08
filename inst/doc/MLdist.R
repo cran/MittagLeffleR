@@ -1,11 +1,11 @@
-## ------------------------------------------------------------------------
+## ----setup, echo=TRUE----------------------------------------------------
 library(MittagLeffleR)
 tail <- 0.7
 scale <- 2
 n <- 1000
 cutoff <- 2 * scale
 
-## ---- echo=FALSE---------------------------------------------------------
+## ---- echo=TRUE, warning=FALSE-------------------------------------------
 r <- rml(n = n, tail = tail, scale=scale)
 edfun <- ecdf(r)
 x <- seq(0.01,10,0.01)
@@ -30,7 +30,7 @@ lines(x,z, lty=2)
 w <- exp(-(x/scale)^tail)
 lines(x,w, lty=2)
 
-## ---- echo=FALSE---------------------------------------------------------
+## ---- echo=TRUE----------------------------------------------------------
 cutoff <- 10
 fac <- sum(r <= cutoff) / n
 r <- r[r <= cutoff]
@@ -39,7 +39,7 @@ x <- seq(0.01,cutoff,0.01)
 y <- dml(x = x, tail = tail, scale=scale) / fac
 lines(x,y, col=2)
 
-## ---- echo=FALSE, warning=FALSE------------------------------------------
+## ---- echo=TRUE, warning=FALSE-------------------------------------------
 library(MittagLeffleR)
 n <- 10^5
 tail <- 0.6
@@ -60,7 +60,7 @@ lines(x,y, col=2)
 w <- exp(-(x/scale))
 lines(x,w, lty=2)
 
-## ---- warning=FALSE, echo=FALSE------------------------------------------
+## ---- warning=FALSE, echo=TRUE-------------------------------------------
 hist(r, freq = FALSE, breaks = 20)
 x <- seq(0.01,cutoff,0.01)
 y <- dml(x = x, tail = tail, scale=scale, second.type = TRUE)
