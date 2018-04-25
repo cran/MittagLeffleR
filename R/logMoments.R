@@ -13,17 +13,20 @@
 #' Log-Moments Estimator for the Mittag-Leffler Distribution.
 #' 
 #' Tail and scale parameter of the Mittag-Leffler distribution are estimated
-#' by matching with the first two empirical log-moments.
+#' by matching with the first two empirical log-moments
+#' (see Cahoy et al., \url{http://doi.org/10.1016/j.jspi.2010.04.016}).
 #' 
 #' @param x     A vector of non-negative data.
 #' @param alpha Confidence intervals are calculated at level 1 - alpha.
 #' @rdname logMomentEstimator
 #' @export
 #' @examples
-#' logMomentEstimator(rml(n = 100000, scale = 0.03, tail = 0.99), alpha=0.95)
+#' logMomentEstimator(rml(n = 1000, scale = 0.03, tail = 0.84), alpha=0.95)
 #' @return 
-#' A named vector with entries (nu     delta      nuLo      nuHi   deltaLo   
-#' deltaHi)
+#' A named vector with entries (nu, delta, nuLo, nuHi, deltaLo, deltaHi)
+#' where nu is the tail parameter and delta the scale parameter of the 
+#' Mittag-Leffler distribution, with confidence intervals 
+#' (nuLo, nuHi) resp. (deltaLo, deltaHi). 
 #' @references 
 #' Cahoy, D. O., Uchaikin, V. V., & Woyczynski Wojbor, W. A. (2010).  
 #' Parameter estimation for fractional Poisson processes.  
@@ -53,7 +56,7 @@ logMomentEstimator = function (x, alpha=0.05) {
   l.delta= delta -zcv*se.delta
   u.delta =  delta + zcv*se.delta
   
-  return(c(nu = nu, delta = delta, nuLo = l.nu, nuHi = u.nu, 
-           deltaLo = l.delta, deltaHi = u.delta))      
+  return(c(tail = nu, scale = delta, tailLo = l.nu, tailHi = u.nu, 
+           scaleLo = l.delta, scaleHi = u.delta))      
 }
 

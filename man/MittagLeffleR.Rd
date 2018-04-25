@@ -48,6 +48,9 @@ to be the number required.}
 Probability density, cumulative distribution
 function, quantile function and random variate generation for the
 two types of Mittag-Leffler distribution.
+The Laplace inversion algorithm by Garrappa is used for the pdf and 
+cdf (see 
+\url{https://www.mathworks.com/matlabcentral/fileexchange/48154-the-mittag-leffler-function}).
 }
 \details{
 The Mittag-Leffler function \code{\link{mlf}} defines two types of 
@@ -78,24 +81,8 @@ dml(1, 0.8)
 dml(1, 0.6, second.type=TRUE)
 pml(2, 0.7, 1.5)
 qml(p = c(0.25, 0.5, 0.75), tail = 0.6, scale = 100)
-rml(1000, 0.7, 1)
+rml(10, 0.7, 1)
 
-## Fitting Mittag-Leffler distribution to observations X by Maximum
-## Likelihood
-
-mlml <- function(X) {
-  log_l <- function(theta) {
-    #transform parameters so can do optimization unconstrained
-    theta[1] <- 1/(1+exp(-theta[1]))
-    theta[2] <- exp(theta[2])
-    -sum(log(dml(X,theta[1],theta[2])))
-  }
-  ml_theta <- stats::optim(c(0.5,0.5), fn=log_l)$par
-  ml_a <- 1/(1 + exp(-ml_theta[1]))
-  ml_d <- exp(ml_theta[2])
-  print(paste("tail =", ml_a, "scale =", ml_d))
-}
-mlml(rml(n = 100, tail = 0.9, scale = 2))
 }
 \references{
 Haubold, H. J., Mathai, A. M., & Saxena, R. K. (2011). Mittag-Leffler
