@@ -38,15 +38,11 @@
 #' @references
 #' Haubold, H. J., Mathai, A. M., & Saxena, R. K. (2011). Mittag-Leffler
 #' Functions and Their Applications. Journal of Applied Mathematics, 2011, 
-#' 1–51. \url{http://doi.org/10.1155/2011/298628}
+#' 1–51. \doi{10.1155/2011/298628}
 #' 
 #' Mittag-Leffler distribution. (2017, May 3).
 #' In Wikipedia, The Free Encyclopedia.
 #' \url{https://en.wikipedia.org/w/index.php?title=Mittag-Leffler_distribution&oldid=778429885}
-#' 
-#' @name MLdistribution
-
-
 #' @param x,q vector of quantiles.
 #' @param tail tail parameter.
 #' @param scale scale parameter.
@@ -62,15 +58,28 @@
 #' @name Mittag-Leffler
 #' @family Mittag Leffler Distribution
 #' @export
+
 dml <- function(x,tail,scale=1,log=FALSE, second.type=FALSE){
+  stopifnot(tail > 0, tail <= 1, scale > 0)
   if (length(tail) > 1){
     stop("length(tail) must be 1.")
   }
+  if(log == TRUE & any(x <= 0)) {
+    stop("For x <= 0 the density is zero. You schould not use log = T")
+  }
+  ind <- which(x <= 0)
+  x[ind] <- 0
   if (second.type==FALSE) {
-    return(dml1(x,tail,scale,log))
-  } else {
+    y <- dml1(x,tail,scale)
+  } 
+  else {
     y <- dml2(x/scale,tail)/scale
-    if (!log) return(y) else return(log(y))
+  }
+  y[ind] <- 0
+  if (!log) {return(y)} 
+  else {
+      stopifnot(all(y != 0))
+      return(log(y))
   }
 }
 
@@ -104,6 +113,9 @@ dml2 <- function(u,tail) {
 #' @export
 pml <- function(q, tail, scale=1, second.type=FALSE, lower.tail=TRUE, 
                 log.p=FALSE) {
+  stopifnot(tail > 0, tail <= 1, scale > 0)
+  ind <- which(q <= 0)
+  q[ind] <- 1
   # rescale
   q <- q/scale
   if (!second.type){
@@ -117,6 +129,7 @@ pml <- function(q, tail, scale=1, second.type=FALSE, lower.tail=TRUE,
   if (log.p) {
     p <- log(p)
   }
+  p[ind] <- 0
   return(p)
 }
 
@@ -143,6 +156,7 @@ pml2 <- function(q,tail) {
 
 qml <- function(p, tail, scale=1, second.type=FALSE, lower.tail=TRUE,
                 log.p=FALSE) {
+  stopifnot(tail > 0, tail <= 1, scale > 0, p >= 0, p <= 1)
   if (log.p) {
     p <- exp(p)
   }
@@ -154,17 +168,18 @@ qml <- function(p, tail, scale=1, second.type=FALSE, lower.tail=TRUE,
   } else {
     q <- scale * qml2(p, tail)
   }
+  q[p == 0] <- 0
   return(q)
 }
 
 qml1 <- function(p,tail,scale=1) {
   x <- numeric(length(p))
-  for (i in 1:length(p)) {
-    qml_p <- function(t) {pml(t,tail,scale) - p[i]}
-    x[i] <- stats::uniroot(qml_p, interval = c(10^-14,100),
-                           extendInt="upX", tol = 1e-14)$root
+  for (i in seq_along(p)) {
+    qml_p <- function(t) {pml(exp(t),tail,scale) - p[i]}
+    x[i] <- stats::uniroot(qml_p, interval = c(log(10^-14),log(100)),
+    extendInt="yes", tol = 1e-14)$root
   }
-  return(x)
+  return(exp(x))
 }
 
 # type 2 with unit scale
@@ -183,12 +198,9 @@ qml2 <- function(p, tail){
 
 #' @export
 #' @family Mittag Leffler Distribution
-#' @param n number of observations. If length(n) > 1, the length is taken
-#'        to be the number required.
+#' @param n number of random draws. 
 rml <- function(n,tail,scale=1, second.type=FALSE){
-  if (length(n) > 1){
-    n <- length(n)
-  }
+  stopifnot(tail > 0, tail <= 1, scale > 0, is.numeric(n), length(n) == 1)
   if (!second.type){
     x <- scale * rml1(n,tail)
   } else {
@@ -199,6 +211,7 @@ rml <- function(n,tail,scale=1, second.type=FALSE){
 
 # unit scale; see e.g. Haubold, Mathai & Saxena (2011)
 rml1 <- function(n, tail){
+  if (tail == 1) return(stats::rexp(n)) 
   # the scale parameter in the Samorodnitsky & Taqqu representation which
   # makes the stable distribution have Laplace transform exp(-s^tail):
   gamma <- (cos(pi*tail/2))^(1/tail)
